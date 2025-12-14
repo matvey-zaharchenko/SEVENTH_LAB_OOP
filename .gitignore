@@ -1,21 +1,117 @@
-# Prerequisites
-*.d
+# Build directories
+build/
+bin/
+_output/
+output/
+*.exe
 
-# Compiled Object files
-*.slo
-*.lo
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+*.cmake
+CTestTestfile.cmake
+
+# Dependency directories
+_deps/
+ThirdParty/
+external/
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Object files
 *.o
 *.obj
+*.lo
 
-# Precompiled Headers
+# Libraries
+*.a
+*.lib
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Test coverage
+gcov/
+*.gcno
+*.gcda
+*.gcov
+
+# Package files
+*.deb
+*.rpm
+*.tar.gz
+*.zip
+
+# Doxygen documentation
+docs/html/
+docs/latex/
+
+# CLion specific
+cmake-build-*/
+
+# Visual Studio Code
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+
+# Qt Creator
+*.user
+
+# Eclipse
+.project
+.cproject
+.settings/
+
+# Visual Studio
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.opensdf
+*.sdf
+ipch/
+*.aps
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+
+# Precompiled headers
 *.gch
 *.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
 
 # Compiled Dynamic libraries
 *.so
@@ -32,10 +128,11 @@
 *.a
 *.lib
 
-# Executables
-*.exe
-*.out
-*.app
+# Backup files
+*~
+*.backup
+*.bak
 
-# debug information files
-*.dwo
+# Core dumps
+core
+core.*
