@@ -1,0 +1,212 @@
+Murder --------
+Attacker: Rogue NPC-1 45 97
+Killed: Elf NPC-12 30 32
+
+Murder --------
+Attacker: Knight_Errant NPC-2 5 43
+Killed: Rogue NPC-1 85 67
+
+Murder --------
+Attacker: Knight_Errant NPC-2 25 43
+Killed: Rogue NPC-13 73 92
+
+Murder --------
+Attacker: Knight_Errant NPC-2 15 33
+Killed: Rogue NPC-23 24 88
+
+Murder --------
+Attacker: Knight_Errant NPC-2 45 43
+Killed: Rogue NPC-26 80 41
+
+Murder --------
+Attacker: Knight_Errant NPC-2 5 43
+Killed: Rogue NPC-31 7 14
+
+Murder --------
+Attacker: Knight_Errant NPC-2 15 3
+Killed: Rogue NPC-40 58 47
+
+Murder --------
+Attacker: Knight_Errant NPC-2 5 13
+Killed: Rogue NPC-46 18 56
+
+Murder --------
+Attacker: Rogue NPC-4 11 39
+Killed: Elf NPC-47 62 39
+
+Murder --------
+Attacker: Knight_Errant NPC-5 67 62
+Killed: Rogue NPC-23 64 8
+
+Murder --------
+Attacker: Knight_Errant NPC-5 87 32
+Killed: Rogue NPC-31 87 74
+
+Murder --------
+Attacker: Knight_Errant NPC-5 77 12
+Killed: Rogue NPC-40 68 47
+
+Murder --------
+Attacker: Elf NPC-7 76 63
+Killed: Knight_Errant NPC-5 87 72
+
+Murder --------
+Attacker: Elf NPC-7 76 13
+Killed: Knight_Errant NPC-11 19 77
+
+Murder --------
+Attacker: Knight_Errant NPC-8 56 30
+Killed: Rogue NPC-4 51 99
+
+Murder --------
+Attacker: Knight_Errant NPC-8 26 80
+Killed: Rogue NPC-33 9 46
+
+Murder --------
+Attacker: Elf NPC-9 36 22
+Killed: Knight_Errant NPC-5 77 42
+
+Murder --------
+Attacker: Knight_Errant NPC-10 98 1
+Killed: Rogue NPC-20 93 79
+
+Murder --------
+Attacker: Knight_Errant NPC-10 98 81
+Killed: Rogue NPC-24 10 5
+
+Murder --------
+Attacker: Knight_Errant NPC-10 68 51
+Killed: Rogue NPC-34 27 43
+
+Murder --------
+Attacker: Knight_Errant NPC-10 78 11
+Killed: Rogue NPC-38 4 14
+
+Murder --------
+Attacker: Knight_Errant NPC-10 58 21
+Killed: Rogue NPC-39 0 63
+
+Murder --------
+Attacker: Knight_Errant NPC-10 58 51
+Killed: Rogue NPC-48 26 16
+
+Murder --------
+Attacker: Knight_Errant NPC-11 29 77
+Killed: Rogue NPC-4 1 59
+
+Murder --------
+Attacker: Knight_Errant NPC-11 99 97
+Killed: Rogue NPC-33 9 16
+
+Murder --------
+Attacker: Knight_Errant NPC-15 2 89
+Killed: Rogue NPC-4 11 29
+
+Murder --------
+Attacker: Knight_Errant NPC-19 62 81
+Killed: Rogue NPC-34 17 23
+
+Murder --------
+Attacker: Rogue NPC-20 63 59
+Killed: Elf NPC-42 84 38
+
+Murder --------
+Attacker: Elf NPC-21 19 21
+Killed: Knight_Errant NPC-10 38 11
+
+Murder --------
+Attacker: Elf NPC-25 26 13
+Killed: Knight_Errant NPC-30 95 75
+
+Murder --------
+Attacker: Rogue NPC-28 70 92
+Killed: Elf NPC-41 28 76
+
+Murder --------
+Attacker: Knight_Errant NPC-29 31 56
+Killed: Rogue NPC-17 7 89
+
+Murder --------
+Attacker: Knight_Errant NPC-29 41 76
+Killed: Rogue NPC-26 0 51
+
+Murder --------
+Attacker: Knight_Errant NPC-29 41 76
+Killed: Rogue NPC-27 33 86
+
+Murder --------
+Attacker: Knight_Errant NPC-29 61 76
+Killed: Rogue NPC-28 90 32
+
+Murder --------
+Attacker: Knight_Errant NPC-29 31 66
+Killed: Rogue NPC-46 8 96
+
+Murder --------
+Attacker: Rogue NPC-34 47 73
+Killed: Elf NPC-16 58 22
+
+Murder --------
+Attacker: Knight_Errant NPC-35 65 54
+Killed: Rogue NPC-20 73 79
+
+Murder --------
+Attacker: Knight_Errant NPC-35 35 44
+Killed: Rogue NPC-24 40 65
+
+Murder --------
+Attacker: Knight_Errant NPC-35 55 14
+Killed: Rogue NPC-48 16 66
+
+Murder --------
+Attacker: Knight_Errant NPC-36 35 42
+Killed: Rogue NPC-26 60 61
+
+Murder --------
+Attacker: Knight_Errant NPC-36 5 22
+Killed: Rogue NPC-46 8 46
+
+Murder --------
+Attacker: Knight_Errant NPC-43 41 73
+Killed: Rogue NPC-34 7 3
+
+Murder --------
+Attacker: Knight_Errant NPC-44 89 94
+Killed: Rogue NPC-27 43 16
+
+Murder --------
+Attacker: Knight_Errant NPC-44 69 84
+Killed: Rogue NPC-28 90 72
+
+Murder --------
+Attacker: Elf NPC-45 10 82
+Killed: Knight_Errant NPC-15 52 89
+
+Murder --------
+Attacker: Knight_Errant NPC-49 9 64
+Killed: Rogue NPC-40 68 67
+
+Murder --------
+Attacker: Knight_Errant NPC-2 65 63
+Killed: Rogue NPC-46 88 46
+
+Murder --------
+Attacker: Knight_Errant NPC-5 57 92
+Killed: Rogue NPC-17 37 29
+
+Murder --------
+Attacker: Knight_Errant NPC-10 18 31
+Killed: Rogue NPC-20 73 39
+
+Murder --------
+Attacker: Knight_Errant NPC-10 28 91
+Killed: Rogue NPC-34 7 83
+
+Murder --------
+Attacker: Elf NPC-14 35 17
+Killed: Knight_Errant NPC-19 2 81
+
+Murder --------
+Attacker: Elf NPC-18 6 93
+Killed: Knight_Errant NPC-32 85 96
+
