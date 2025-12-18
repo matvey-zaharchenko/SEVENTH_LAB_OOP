@@ -1,265 +1,271 @@
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include "../include/npc.h"
 #include "../include/elf.h"
 #include "../include/knight_errant.h"
 #include "../include/rogue.h"
 #include "../include/tech_impl.h"
+#include "../include/fightManager.h"
 #include <sstream>
 #include <fstream>
-#include <memory>
-#include <filesystem>
+#include <chrono>
+#include <thread>
 
-#include <gtest/gtest.h>
-#include "tech_impl.h"
-#include <sstream>
-#include <fstream>
-#include <memory>
-#include <filesystem>
+using namespace std::chrono_literals;
 
+// Тестовый наблюдатель для проверки событий боя
+class MockObserver : public IFightObserver {
+public:
+    struct FightEvent {
+        std::shared_ptr<NPC> attacker;
+        std::shared_ptr<NPC> defender;
+        bool win;
+    };
+    
+    std::vector<FightEvent> events;
+    
+    void on_fight(const std::shared_ptr<NPC> attacker,
+                  const std::shared_ptr<NPC> defender,
+                  bool win) override {
+        events.push_back({attacker, defender, win});
+    }
+    
+    void clear() { events.clear(); }
+    
+    size_t count() const { return events.size(); }
+    
+    bool contains_win(const std::string& attacker_name, 
+                      const std::string& defender_name) const {
+        for (const auto& e : events) {
+            if (e.win && 
+                e.attacker->name == attacker_name && 
+                e.defender->name == defender_name) {
+                return true;
+            }
+        }
+        return false;
+    }
+};
 
-std::string create_name(const std::string& base) {
-    static int counter = 0;
-    return base + std::to_string(counter++);
+// Тесты для базового класса NPC
+TEST(NPCTest, ConstructorAndBasicProperties) {
+    std::string name = "TestNPC";
+    NPC* npc = new Knight_Errant(name, 10, 20);  // Используем Knight_Errant как пример
+    
+    EXPECT_EQ(npc->name, name);
+    EXPECT_EQ(npc->position().first, 10);
+    EXPECT_EQ(npc->position().second, 20);
+    EXPECT_TRUE(npc->is_alive());
+    EXPECT_EQ(npc->get_type(), KnightErrantType);
+    
+    delete npc;  // Для тестового NPC без shared_ptr
 }
 
 
-std::shared_ptr<NPC> create_npc_with_suffix(NpcType type, const std::string& base, 
-                                           const std::string& suffix, int x, int y) {
-    std::string name = base + suffix;
-    return factory(type, name, x, y);
+TEST(NPCTest, IsAliveAndMustDie) {
+    std::string name = "TestNPC";
+    auto npc = std::make_shared<Knight_Errant>(name, 0, 0);
+    
+    EXPECT_TRUE(npc->is_alive());
+    npc->must_die();
+    EXPECT_FALSE(npc->is_alive());
 }
 
+TEST(NPCTest, IsCloseCalculation) {
+    std::string name1 = "NPC1";
+    std::string name2 = "NPC2";
+    auto npc1 = std::make_shared<Knight_Errant>(name1, 0, 0);
+    auto npc2 = std::make_shared<Knight_Errant>(name2, 3, 4);
+    
+    // Расстояние = sqrt(3² + 4²) = 5
+    EXPECT_TRUE(npc1->is_close(npc2, 5));   // На границе
+    EXPECT_TRUE(npc1->is_close(npc2, 6));   // Внутри радиуса
+    EXPECT_FALSE(npc1->is_close(npc2, 4));  // За пределами
+}
 
-// TEST(BasicTests, CreateAllNPCs) {
-//     std::string name = create_name("TestNPC");
+TEST(NPCTest, RollCubeInRange) {
+    std::string name = "TestNPC";
+    auto npc = std::make_shared<Knight_Errant>(name, 0, 0);
     
-//     auto rogue = factory(RogueType, name, 10, 20);
-//     auto elf = factory(ElfType, name, 30, 40);
-//     auto knight = factory(KnightErrantType, name, 50, 60);
-    
-//     ASSERT_NE(rogue, nullptr);
-//     ASSERT_NE(elf, nullptr);
-//     ASSERT_NE(knight, nullptr);
-    
-//     EXPECT_NO_THROW(rogue->print());
-//     EXPECT_NO_THROW(elf->print());
-//     EXPECT_NO_THROW(knight->print());
-// }
+    // Бросаем кубик несколько раз, проверяем диапазон
+    for (int i = 0; i < 100; ++i) {
+        int result = npc->roll_cube();
+        EXPECT_GE(result, 1);
+        EXPECT_LE(result, 6);
+    }
+}
 
+TEST(NPCTest, StepAndKillLength) {
+    std::string name = "TestNPC";
+    auto knight = std::make_shared<Knight_Errant>(name, 0, 0);
+    auto elf = std::make_shared<Elf>(name, 0, 0);
+    auto rogue = std::make_shared<Rogue>(name, 0, 0);
+    
+    // Проверяем характерные длины для каждого типа
+    EXPECT_EQ(knight->stepLen(), 30);
+    EXPECT_EQ(knight->killLen(), 10);
+    
+    EXPECT_EQ(elf->stepLen(), 10);
+    EXPECT_EQ(elf->killLen(), 50);
+    
+    EXPECT_EQ(rogue->stepLen(), 10);
+    EXPECT_EQ(rogue->killLen(), 10);
+}
 
-// TEST(BasicTests, FactoryCreatesNPCs) {
-//     std::string name = create_name("FactoryNPC");
+// Тесты для фабрик
+TEST(FactoryTest, CreateFromParameters) {
+    std::string name = "FactoryNPC";
     
-//     auto rogue = factory(RogueType, name, 100, 200);
-//     auto elf = factory(ElfType, name, 300, 400);
-//     auto knight = factory(KnightErrantType, name, 500, 600);
+    auto rogue = factory(RogueType, name, 10, 20);
+    EXPECT_NE(rogue, nullptr);
+    EXPECT_EQ(rogue->get_type(), RogueType);
+    EXPECT_EQ(rogue->name, name);
     
-//     ASSERT_NE(rogue, nullptr);
-//     ASSERT_NE(elf, nullptr);
-//     ASSERT_NE(knight, nullptr);
+    auto knight = factory(KnightErrantType, name, 30, 40);
+    EXPECT_NE(knight, nullptr);
+    EXPECT_EQ(knight->get_type(), KnightErrantType);
     
-//     std::stringstream ss;
-//     EXPECT_NO_THROW(rogue->save(ss));
-//     EXPECT_NO_THROW(elf->save(ss));
-//     EXPECT_NO_THROW(knight->save(ss));
-// }
+    auto elf = factory(ElfType, name, 50, 60);
+    EXPECT_NE(elf, nullptr);
+    EXPECT_EQ(elf->get_type(), ElfType);
+}
 
+TEST(FactoryTest, CreateFromStream) {
+    std::stringstream ss;
+    ss << "Rogue RogueNPC 100 200\n";
+    
+    auto npc = factory(ss);
+    EXPECT_NE(npc, nullptr);
+    EXPECT_EQ(npc->get_type(), RogueType);
+    EXPECT_EQ(npc->name, "RogueNPC");
+    EXPECT_EQ(npc->position().first, 100);
+    EXPECT_EQ(npc->position().second, 200);
+}
 
-// TEST(BasicTests, SaveToStream) {
-//     std::string name = create_name("SaveTest");
-//     auto npc = factory(RogueType, name, 123, 456);
-//     ASSERT_NE(npc, nullptr);
+TEST(FactoryTest, InvalidTypeFromStream) {
+    std::stringstream ss;
+    ss << "InvalidType NPC 10 20\n";
     
-//     std::stringstream ss;
-//     npc->save(ss);
+    // Не должно быть исключения, должен быть nullptr или сообщение об ошибке
+    testing::internal::CaptureStderr();
+    auto npc = factory(ss);
+    std::string output = testing::internal::GetCapturedStderr();
     
-//     std::string type, loaded_name;
-//     int x, y;
-//     ss >> type >> loaded_name >> x >> y;
-    
-//     EXPECT_EQ(type, "Rogue");
-//     EXPECT_EQ(loaded_name, name);
-//     EXPECT_EQ(x, 123);
-//     EXPECT_EQ(y, 456);
-// }
+    // Проверяем, что есть сообщение об ошибке
+    EXPECT_TRUE(output.find("unexpected NPC type") != std::string::npos ||
+                npc == nullptr);
+}
 
+// Тесты для сохранения и загрузки
+TEST(IOTest, SaveAndLoadNPC) {
+    std::string name = "TestNPC";
+    auto original = std::make_shared<Elf>(name, 42, 24);
+    
+    std::stringstream ss;
+    original->save(ss);
+    
+    // Проверяем формат вывода
+    std::string saved = ss.str();
+    EXPECT_TRUE(saved.find("Elf") != std::string::npos);
+    EXPECT_TRUE(saved.find(name) != std::string::npos);
+    EXPECT_TRUE(saved.find("42") != std::string::npos);
+    EXPECT_TRUE(saved.find("24") != std::string::npos);
+}
 
+TEST(IOTest, SaveAndLoadArray) {
+    set_t array;
+    std::string name1 = "NPC1";
+    std::string name2 = "NPC2";
+    
+    array.insert(std::make_shared<Rogue>(name1, 10, 20));
+    array.insert(std::make_shared<Knight_Errant>(name2, 30, 40));
+    
+    const std::string filename = "test_save.txt";
+    save_array(array, filename);
+    
+    // Проверяем, что файл создан
+    std::ifstream test_file(filename);
+    EXPECT_TRUE(test_file.good());
+    
+    // Загружаем обратно
+    set_t loaded = load_from_file(filename);
+    EXPECT_EQ(loaded.size(), 2);
+    
+    // Очищаем тестовый файл
+    std::remove(filename.c_str());
+}
 
-// TEST(FightTests, DistanceCheck) {
-//     std::string name1 = create_name("Dist1");
-//     std::string name2 = create_name("Dist2");
+// Тесты для логики боев
+TEST(FightTest, ElfVsKnight) {
+    std::string elf_name = "Elf1";
+    std::string knight_name = "Knight1";
+    auto elf = std::make_shared<Elf>(elf_name, 0, 0);
+    auto knight = std::make_shared<Knight_Errant>(knight_name, 5, 0);  // В пределах радиуса
     
-//     auto npc1 = factory(RogueType, name1, 0, 0);
-//     auto npc2 = factory(ElfType, name2, 3, 4);
+    MockObserver observer;
+    elf->subscribe(std::make_shared<MockObserver>(observer));
+    knight->subscribe(std::make_shared<MockObserver>(observer));
     
-//     ASSERT_NE(npc1, nullptr);
-//     ASSERT_NE(npc2, nullptr);
+    // Эльф должен победить Рыцаря
+    bool result = elf->fight(knight);
+    EXPECT_TRUE(result);
     
-//     EXPECT_TRUE(npc1->is_close(npc2, 10));
-//     EXPECT_TRUE(npc1->is_close(npc2, 5));
-//     EXPECT_FALSE(npc1->is_close(npc2, 4));
-//     EXPECT_TRUE(npc2->is_close(npc1, 10));
-// }
+    // Проверяем уведомления (если fight_notify вызывается)
+    // Этот тест зависит от реализации fight_notify в ваших методах fight
+}
 
-// TEST(FightTests, SimpleFight) {
-//     set_t array;
+TEST(FightTest, KnightVsRogue) {
+    std::string knight_name = "Knight1";
+    std::string rogue_name = "Rogue1";
+    auto knight = std::make_shared<Knight_Errant>(knight_name, 0, 0);
+    auto rogue = std::make_shared<Rogue>(rogue_name, 5, 0);
     
-//     std::string attacker_name = create_name("Attacker");
-//     std::string defender_name = create_name("Defender");
-    
-//     auto attacker = factory(RogueType, attacker_name, 0, 0);
-//     auto defender = factory(ElfType, defender_name, 1, 1);
-    
-//     array.insert(attacker);
-//     array.insert(defender);
-    
-//     auto dead_list = fight(array, 10);
-    
-//     EXPECT_NO_THROW(fight(array, 10));
-    
-//     // Для отладки
-//     std::cout << "Test SimpleFight: " << dead_list.size() << " killed" << std::endl;
-// }
+    // Рыцарь должен победить Разбойника
+    bool result = knight->fight(rogue);
+    EXPECT_TRUE(result);
+}
 
+TEST(FightTest, RogueVsElf) {
+    std::string rogue_name = "Rogue1";
+    std::string elf_name = "Elf1";
+    auto rogue = std::make_shared<Rogue>(rogue_name, 0, 0);
+    auto elf = std::make_shared<Elf>(elf_name, 5, 0);
+    
+    // Разбойник должен победить Эльфа
+    bool result = rogue->fight(elf);
+    EXPECT_TRUE(result);
+}
 
-// TEST(FightTests, NoSelfFight) {
-//     set_t array;
-//     std::string name = create_name("Self");
+TEST(FightTest, SameTypeFights) {
+    std::string name1 = "NPC1";
+    std::string name2 = "NPC2";
     
-//     auto npc = factory(RogueType, name, 0, 0);
-//     array.insert(npc);
+    // Проверяем бои одинаковых типов (все должны проигрывать)
+    auto elf1 = std::make_shared<Elf>(name1, 0, 0);
+    auto elf2 = std::make_shared<Elf>(name2, 5, 0);
+    EXPECT_FALSE(elf1->fight(elf2));
     
-//     auto dead_list = fight(array, 1000);
-//     EXPECT_EQ(dead_list.size(), 0);
-// }
+    auto knight1 = std::make_shared<Knight_Errant>(name1, 0, 0);
+    auto knight2 = std::make_shared<Knight_Errant>(name2, 5, 0);
+    EXPECT_FALSE(knight1->fight(knight2));
+    
+    auto rogue1 = std::make_shared<Rogue>(name1, 0, 0);
+    auto rogue2 = std::make_shared<Rogue>(name2, 5, 0);
+    EXPECT_FALSE(rogue1->fight(rogue2));
+}
 
-
-// TEST(FileTests, SaveAndLoadFile) {
-//     set_t original;
-//     std::string base_name = create_name("FileTest");
+// Тесты для AttackVisitor
+TEST(VisitorTest, VisitorDispatch) {
+    std::string attacker_name = "Attacker";
+    std::string defender_name = "Defender";
     
-//     // Создаем переменные для имен
-//     std::string name1 = base_name + "_1";
-//     std::string name2 = base_name + "_2";
+    auto attacker = std::make_shared<Knight_Errant>(attacker_name, 0, 0);
+    auto rogue = std::make_shared<Rogue>(defender_name, 0, 0);
+    auto knight = std::make_shared<Knight_Errant>(defender_name, 0, 0);
+    auto elf = std::make_shared<Elf>(defender_name, 0, 0);
     
-//     original.insert(factory(RogueType, name1, 10, 20));
-//     original.insert(factory(ElfType, name2, 30, 40));
-    
-//     std::string filename = "test_save_load.txt";
-//     save_array(original, filename);
-    
-//     std::ifstream check(filename);
-//     EXPECT_TRUE(check.good());
-    
-//     check.seekg(0, std::ios::end);
-//     size_t size = check.tellg();
-//     check.close();
-//     EXPECT_GT(size, 0);
-    
-//     set_t loaded = load_from_file(filename);
-//     EXPECT_EQ(loaded.size(), original.size());
-    
-//     // Удаляем временный файл
-//     std::remove(filename.c_str());
-// }
-
-
-// TEST(GenerationTests, GenerateNPCs) {
-//     set_t array;
-    
-//     generate_npcs(array, 5, 100);
-    
-//     EXPECT_EQ(array.size(), 5);
-    
-//     for (const auto& npc : array) {
-//         ASSERT_NE(npc, nullptr);
-//         EXPECT_NO_THROW(npc->print());
-//     }
-// }
-
-
-// TEST(VisitorTests, AcceptMethodWorks) {
-//     std::string base_name = create_name("VisitorTest");
-    
-//     // Создаем отдельные переменные для имен
-//     std::string attacker_name = base_name + "_att";
-//     std::string rogue_name = base_name + "_rogue";
-//     std::string elf_name = base_name + "_elf";
-//     std::string knight_name = base_name + "_knight";
-    
-//     auto attacker = factory(RogueType, attacker_name, 0, 0);
-//     auto defender_rogue = factory(RogueType, rogue_name, 1, 1);
-//     auto defender_elf = factory(ElfType, elf_name, 1, 1);
-//     auto defender_knight = factory(KnightErrantType, knight_name, 1, 1);
-    
-//     ASSERT_NE(attacker, nullptr);
-//     ASSERT_NE(defender_rogue, nullptr);
-//     ASSERT_NE(defender_elf, nullptr);
-//     ASSERT_NE(defender_knight, nullptr);
-    
-//     EXPECT_NO_THROW(defender_rogue->accept(attacker));
-//     EXPECT_NO_THROW(defender_elf->accept(attacker));
-//     EXPECT_NO_THROW(defender_knight->accept(attacker));
-// }
-
-// TEST(FightTests, FightLogic) {
-//     set_t array;
-//     std::string base_name = create_name("LogicTest");
-    
-//     // Создаем отдельные переменные для имен
-//     std::string rogue_name = base_name + "_rogue";
-//     std::string elf_name = base_name + "_elf";
-//     std::string knight_name = base_name + "_knight";
-    
-//     auto rogue = factory(RogueType, rogue_name, 0, 0);
-//     auto elf = factory(ElfType, elf_name, 1, 1);
-//     auto knight = factory(KnightErrantType, knight_name, 2, 2);
-    
-//     array.insert(rogue);
-//     array.insert(elf);
-//     array.insert(knight);
-    
-//     auto dead_list = fight(array, 10);
-    
-//     std::cout << "Test FightLogic: " << dead_list.size() << " killed" << std::endl;
-// }
-
-
-// TEST(FightTests, MultipleAttackers) {
-//     set_t array;
-//     std::string base_name = create_name("Multi");
-    
-//     // Цель в центре
-//     std::string target_name = base_name + "_target";
-//     auto target = factory(ElfType, target_name, 10, 10);
-    
-//     // Несколько атакующих вокруг
-//     std::string att1_name = base_name + "_att1";
-//     std::string att2_name = base_name + "_att2";
-//     std::string att3_name = base_name + "_att3";
-    
-//     auto attacker1 = factory(RogueType, att1_name, 9, 10);
-//     auto attacker2 = factory(RogueType, att2_name, 11, 10);
-//     auto attacker3 = factory(RogueType, att3_name, 20, 20); // Далеко
-    
-//     array.insert(target);
-//     array.insert(attacker1);
-//     array.insert(attacker2);
-//     array.insert(attacker3);
-    
-//     auto dead_list = fight(array, 5);
-    
-//     std::cout << "Test MultipleAttackers: " << dead_list.size() << " killed" << std::endl;
-// }
-
-
-// int main(int argc, char **argv) {
-//     ::testing::InitGoogleTest(&argc, argv);
-    
-//     std::srand(42);
-    
-//     // Инициализируем файл логов
-//     initialize_file();
-    
-//     return RUN_ALL_TESTS();
-// }
+    AttackVisitor visitor_rogue(rogue);
+    AttackVisitor visitor_knight(knight);
+    AttackVisitor visitor_elf(elf);
+}
+    // Рыцарь посещает разных NPC через visitor
+    // Эти тесты проверя

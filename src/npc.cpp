@@ -79,10 +79,11 @@ int NPC::roll_cube() {
     return random_num(1, 6);
 }
 
-int NPC::stepLen() const{
+int NPC::killLen() const {
     return killAndStepLen.first;
 }
-int NPC::killLen() const {
+
+int NPC::stepLen() const{
     return killAndStepLen.second;
 }
 
